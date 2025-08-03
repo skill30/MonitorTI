@@ -1,0 +1,7 @@
+{
+    "id_equipo": "PC-Abel",
+    "vlan": "VLAN 10",
+    "servidor_url": "http://127.0.0.1:8000/api/registros/",
+    "intervalo_segundos": 10,
+    "token": "secreto123"
+}
