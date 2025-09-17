@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi.responses import HTMLResponse
 from typing import List
@@ -83,22 +84,34 @@ def recibir_data(payload: schemas.RegistroCreate, db: Session = Depends(get_db),
     db.commit()
     return {"status": "ok", "registro_id": nuevo.id}
 
-@router.get("/registros", response_model=List[schemas.Registro])
-def ver_registros_json(db: Session = Depends(get_db)):
-    registros = db.query(models.Registro).order_by(models.Registro.timestamp.desc()).limit(20).all()
+@router.get("/registros/agrupados")
+def obtener_registros_agrupados(
+    rango: str = "day",  # puede ser "hour", "day", "week", "month"
+    db: Session = Depends(hget_db)
+):
+    if rango not in ["hour", "day", "week", "month"]:
+        return {"error": "Rango no válido. Usa: hour, day, week, month"}
+
+    registros = (
+        db.query(
+            func.date_trunc(rango, models.Registro.timestamp).label("periodo"),
+            func.avg(models.Registro.cpu_percent).label("cpu_promedio"),
+            func.avg(models.Registro.mem_uso_percent).label("memoria_promedio"),
+            func.avg(models.Registro.disco_percent).label("disco_promedio"),
+        )
+        .group_by(func.date_trunc(rango, models.Registro.timestamp))
+        .order_by(func.date_trunc(rango, models.Registro.timestamp))
+        .all()
+    )
+
     return [
-        schemas.Registro(
-            id=r.id,
-            equipo=r.equipo.nombre,
-            cpu_percent=r.cpu_percent,
-            mem_total=r.mem_total,
-            mem_disponible=r.mem_disponible,
-            mem_uso_percent=r.mem_uso_percent,
-            disco_total=r.disco_total,
-            disco_usado=r.disco_usado,
-            disco_percent=r.disco_percent,
-            timestamp=r.timestamp
-        ) for r in registros
+        {
+            "periodo": r.periodo,
+            "cpu_promedio": float(r.cpu_promedio),
+            "memoria_promedio": float(r.memoria_promedio),
+            "disco_promedio": float(r.disco_promedio),
+        }
+        for r in registros
     ]
 
 # ============================

@@ -1,8 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import RegistroDashboard from '../components/RegistroTabla.jsx';
+import GraficoVLAN from '../components/GraficoVLAN.jsx';
 ---
 
 <Layout>
-	<RegistroDashboard client:load />
+  <h1>Dashboard Monitoreo TI</h1>
+
+  <section>
+    <RegistroDashboard client:load />
+  </section>
+
+  <section>
+    <GraficoVLAN client:load />
+  </section>
 </Layout>
+

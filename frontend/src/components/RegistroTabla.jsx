@@ -1,76 +1,84 @@
 import React, { useEffect, useState } from "react";
+import { Bar, Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+import { getRegistrosAgrupados } from "../utils/api";
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale
+);
 
 export default function RegistroDashboard() {
   const [registros, setRegistros] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [rango, setRango] = useState("day");
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/registros")
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al obtener registros");
-        return res.json();
+    let activo = true;
+    getRegistrosAgrupados(rango)
+      .then(data => {
+        if (activo) setRegistros(data);
       })
-      .then((data) => setRegistros(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(console.error);
 
-  const calcularPromedio = (campo) => {
-    const valores = registros.map((r) => parseFloat(r[campo]) || 0);
-    const total = valores.reduce((a, b) => a + b, 0);
-    return (total / valores.length).toFixed(1);
-  };
+    return () => { activo = false };
+  }, [rango]);
 
-  const renderCard = (titulo, campo) => (
-    <div className="card rounded-lg border border-[#E0E0E0] shadow-sm">
-      <div className="bg-[#F0F0F0] h-10 flex items-center px-3 rounded-t-lg">
-        <h2 className="text-sm font-semibold uppercase">{titulo}</h2>
-      </div>
-      <div className="p-3 overflow-auto h-[210px]">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-white font-semibold">
-              <th className="text-left py-2 px-3">Nombre</th>
-              <th className="text-center py-2 px-3">PERCENTAGE USED</th>
-              <th className="text-center py-2 px-3">PROM</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registros.map((r) => (
-              <tr key={r.id} className="even:bg-[#F9F9F9] hover:bg-[#F0F0F0]">
-                <td className="py-2 px-3">{r.equipo}</td>
-                <td className="text-center py-2 px-3">
-                  {r[campo]}%
-                </td>
-                <td className="text-center py-2 px-3">
-                  {calcularPromedio(campo)}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  if (cargando) return <p className="text-gray-500">Cargando gráficos...</p>;
+  if (!registros.length) return <p className="text-gray-500">No hay datos para mostrar</p>;
 
-  if (loading) return <p className="text-gray-400 font-mono p-4">Cargando registros...</p>;
-  if (error) return <p className="text-red-500 font-mono p-4">⚠️ {error}</p>;
+  const labels = registros,.map(r => new Date(r.periodo).toLocaleDateString());
+  const cpuPromedio = registros.map(r => r.cpu_promedio);
+  const memoriaPromedio = registros.map(r => r.memoria_promedio);
+  const discoPromedio = registros.map(r => r.disco_promedio);
+
+  const dataCPU = { labels, datasets: [{ label: "CPU Promedio (%)", data: cpuPromedio, backgroundColor: "rgba(75, 192, 192, 0.6)" }] };
+  const dataMemoria = { labels, datasets: [{ label: "Memoria Promedio (%)", data: memoriaPromedio, backgroundColor: "rgba(255, 99, 132, 0.6)" }] };
+  const dataDisco = { labels, datasets: [{ label: "Disco Promedio (%)", data: discoPromedio, backgroundColor: "rgba(153, 102, 255, 0.6)" }] };
 
   return (
-    <div className="bg-white font-['Inter'] text-[#1E1E1E] p-6 max-w-[1200px] mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold uppercase">GENERAL</h1>
-        <div className="border-b border-[#E0E0E0] mt-4 w-full"></div>
+    <div className="space-y-6 mt-8">
+      <div className="flex gap-2">
+        {["hour", "day", "week", "month"].map(opcion => (
+          <button
+            key={opcion}
+            className={`px-3 py-1 rounded ${rango === opcion ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+            onClick={() => setRango(opcion)}
+          >
+            {opcion}
+          </button>
+        ))}
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
-        {renderCard("Uso de CPU (%) por máquina", "cpu_percent")}
-        {renderCard("Uso de Disco (%) por máquina", "disco_percent")}
-        {renderCard("Uso de RAM (%) por máquina", "mem_uso_percent")}
-        {renderCard("Uso de GPU (%) por máquina", "gpu_percent")}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-lg font-bold mb-4">Uso de CPU Promedio</h2>
+          <Bar data={dataCPU} />
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-lg font-bold mb-4">Distribución de Memoria Promedio</h2>
+          <Pie data={dataMemoria} />
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-lg font-bold mb-4">Uso de Disco Promedio</h2>
+          <Bar data={dataDisco} />
+        </div>
       </div>
     </div>
   );
