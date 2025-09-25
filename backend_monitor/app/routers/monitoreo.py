@@ -7,8 +7,11 @@ from typing import List
 from .. import models, schemas, database
 
 router = APIRouter(
+
     prefix="/api"
-    )
+
+)
+
 TOKEN_ESPERADO = "secreto123"
 
 # --- DB Dependency ---
@@ -27,7 +30,9 @@ def get_db():
 def crear_vlan(vlan: schemas.VLANCreate, db: Session = Depends(get_db)):
     existente = db.query(models.VLAN).filter_by(nombre=vlan.nombre).first()
     if existente:
+
         raise HTTPException(status_code=400, detail="VLAN ya existe")
+    
     nueva = models.VLAN(nombre=vlan.nombre)
     db.add(nueva)
     db.commit()
@@ -55,6 +60,7 @@ def registrar_equipo(equipo: schemas.EquipoCreate, db: Session = Depends(get_db)
 
 @router.get("/equipos/", response_model=List[schemas.Equipo])
 def obtener_equipos(db: Session = Depends(get_db)):
+
     return db.query(models.Equipo).all()
 
 # ============================
@@ -64,10 +70,12 @@ def obtener_equipos(db: Session = Depends(get_db)):
 @router.post("/registros/")
 def recibir_data(payload: schemas.RegistroCreate, db: Session = Depends(get_db), authorization: str = Header(None)):
     if authorization != f"Bearer {TOKEN_ESPERADO}":
+
         raise HTTPException(status_code=401, detail="Token inválido")
 
     equipo = db.query(models.Equipo).filter_by(nombre=payload.equipo).first()
     if not equipo:
+        
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
     nuevo = models.Registro(
@@ -87,7 +95,7 @@ def recibir_data(payload: schemas.RegistroCreate, db: Session = Depends(get_db),
 @router.get("/registros/agrupados")
 def obtener_registros_agrupados(
     rango: str = "day",  # puede ser "hour", "day", "week", "month"
-    db: Session = Depends(hget_db)
+    db: Session = Depends(get_db)
 ):
     if rango not in ["hour", "day", "week", "month"]:
         return {"error": "Rango no válido. Usa: hour, day, week, month"}
