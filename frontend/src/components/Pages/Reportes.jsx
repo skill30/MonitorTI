@@ -1,5 +1,6 @@
 export default function Reporte() {
   return (
+    
     <div className="space-y-8">
       {/* Encabezado */}
       <section className="p-6 bg-gray-100 rounded-md shadow">
