@@ -11,21 +11,18 @@ export default function ConfiguracionPage() {
     confirmar: false,
   });
 
+  // Detectar preferencia inicial
   useEffect(() => {
-    AOS.init({ duration: 800, easing: "ease-in-out", once: true });
-    feather.replace();
-
-    // Dark mode inicial
-    const stored = localStorage.getItem("darkMode");
-    if (
-      stored === "true" ||
-      (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      setDarkMode(true);
-      document.documentElement.classList.add("dark");
+    const saved = localStorage.getItem("darkMode");
+    if (saved !== null) {
+      setDarkMode(JSON.parse(saved));
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setDarkMode(prefersDark);
     }
   }, []);
 
+  // Aplicar dark mode al <html> y guardar en localStorage
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -36,8 +33,13 @@ export default function ConfiguracionPage() {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    AOS.init({ duration: 800, easing: "ease-in-out", once: true });
+    feather.replace();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center py-10">
+    <div className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white flex items-center justify-center py-10">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">
           Configuración del Sistema
@@ -105,9 +107,6 @@ export default function ConfiguracionPage() {
               </div>
             </div>
           </section>
-
-          {/* Gestión de VLANs */}
-          {/* --- Te paso solo un bloque de ejemplo, pero seguiría igual para el resto --- */}
 
           {/* Preferencias del sistema */}
           <section

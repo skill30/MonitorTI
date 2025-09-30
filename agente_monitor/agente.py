@@ -2,6 +2,7 @@
 #agente se importan los recolectores y se imprime un indicador para saber si el agente inicio correctamente.
 # despues entramos en bucle para repetir el proceso hasta que sea interrumpido.
 
+
 import schedule
 import time
 from config import INTERVALO_SEGUNDOS
@@ -11,8 +12,7 @@ from recolectores.disco import obtener_disco
 from recolectores.red import obtener_red
 from utils import enviar_datos 
 
-
-def ciclo():    
+def ciclo():
     data = {}
     data.update(obtener_cpu())
     data.update(obtener_memoria())
