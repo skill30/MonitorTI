@@ -44,6 +44,28 @@ def obtener_vlans(db: Session = Depends(get_db)):
     return db.query(models.VLAN).all()
 
 # ============================
+# Conteo de Equipos por VLAN
+# ============================
+
+@router.get("/vlans/equipos/conteo")
+def conteo_equipos_por_vlan(db: Session = Depends(get_db)):
+    resultados = (
+        db.query(
+            models.VLAN.nombre.label("vlan"),
+            func.count(models.Equipo.id).label("total_equipos")
+        )
+        .join(models.Equipo, models.Equipo.vlan_id == models.VLAN.id)
+        .group_by(models.VLAN.nombre)
+        .all()
+    )
+
+    return [
+        {"vlan": r.vlan, "total_equipos": r.total_equipos}
+        for r in resultados
+    ]
+
+
+# ============================
 # Equipo Endpoints
 # ============================
 

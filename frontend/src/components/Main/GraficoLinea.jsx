@@ -1,4 +1,4 @@
-// GraficoLinea.jsx
+import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -22,13 +22,46 @@ ChartJS.register(
 );
 
 export default function GraficoLinea() {
-  const labels = ["10:00", "11:00", "12:00", "13:00", "14:00"];
+  const [vlans, setVlans] = useState([]);
+  const [vlanId, setVlanId] = useState("");
+  const [registros, setRegistros] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Obtener lista de VLANs
+  useEffect(() => {
+    async function fetchVlans() {
+      const res = await fetch("http://localhost:8000/api/vlans/");
+      const data = await res.json();
+      setVlans(data);
+      if (data.length > 0) setVlanId(data[0].id);
+    }
+    fetchVlans();
+  }, []);
+
+  // Obtener registros de la VLAN seleccionada
+  useEffect(() => {
+    if (!vlanId) return;
+    setLoading(true);
+    async function fetchRegistros() {
+      const res = await fetch(`http://localhost:8000/api/vlans/${vlanId}/registros`);
+      const data = await res.json();
+      setRegistros(data.reverse()); // Para que estén en orden cronológico
+      setLoading(false);
+    }
+    fetchRegistros();
+  }, [vlanId]);
+
+  const labels = registros.map(r =>
+    new Date(r.timestamp).toLocaleString("es-MX", { hour: "2-digit", minute: "2-digit" })
+  );
+  const cpu = registros.map(r => r.cpu_percent);
+
   const data = {
     labels,
     datasets: [
       {
         label: "CPU %",
-        data: [30, 50, 40, 60, 70],
+        data: cpu,
         borderColor: "rgba(75,192,192,1)",
         backgroundColor: "rgba(75,192,192,0.2)",
         fill: true,
@@ -52,10 +85,27 @@ export default function GraficoLinea() {
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow h-[300px]">
-      <h2 className="text-lg font-semibold mb-2">Uso de CPU en el tiempo</h2>
+    <div className="bg-white p-4 rounded-2xl shadow h-[300px] flex flex-col">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">Uso de CPU por VLAN</h2>
+        <select
+          className="border rounded px-2 py-1 text-sm"
+          value={vlanId}
+          onChange={e => setVlanId(e.target.value)}
+        >
+          {vlans.map(vlan => (
+            <option key={vlan.id} value={vlan.id}>
+              {vlan.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="h-[240px] w-full">
-        <Line data={data} options={options} />
+        {loading ? (
+          <p>Cargando datos...</p>
+        ) : (
+          <Line data={data} options={options} />
+        )}
       </div>
     </div>
   );
