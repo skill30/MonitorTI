@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -18,14 +19,55 @@ ChartJS.register(
   LinearScale
 );
 
-export default function GraficoBar({ title, labels, dataValues, color }) {
+export default function GraficoBarRed() {
+  const [vlans, setVlans] = useState([]);
+  const [vlanId, setVlanId] = useState("");
+  const [registros, setRegistros] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Obtener lista de VLANs
+  useEffect(() => {
+    async function fetchVlans() {
+      const res = await fetch("http://10.0.0.138:8000/api/vlans/");
+      const data = await res.json();
+      setVlans(data);
+      if (data.length > 0) setVlanId(data[0].id);
+    }
+    fetchVlans();
+  }, []);
+
+  // Obtener registros de la VLAN seleccionada
+  useEffect(() => {
+    if (!vlanId) return;
+    setLoading(true);
+    async function fetchRegistros() {
+      const res = await fetch(
+        `http://10.0.0.138:8000/api/vlans/${vlanId}/registros`
+      );
+      const data = await res.json();
+      setRegistros(data.reverse());
+      setLoading(false);
+    }
+    fetchRegistros();
+  }, [vlanId]);
+
+  // Sumar los bytes enviados y recibidos de todos los registros de la VLAN seleccionada
+  const totalEnviados = registros.reduce(
+    (acc, r) => acc + (r.bytes_enviados ?? 0),
+    0
+  );
+  const totalRecibidos = registros.reduce(
+    (acc, r) => acc + (r.bytes_recibidos ?? 0),
+    0
+  );
+
   const data = {
-    labels,
+    labels: ["Bytes Enviados", "Bytes Recibidos"],
     datasets: [
       {
-        label: title,
-        data: dataValues,
-        backgroundColor: color || "rgba(75, 192, 192, 0.6)",
+        label: "Tráfico de Red",
+        data: [totalEnviados, totalRecibidos],
+        backgroundColor: ["#36A2EB", "#FFCE56"],
       },
     ],
   };
@@ -34,22 +76,37 @@ export default function GraficoBar({ title, labels, dataValues, color }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: "bottom",
-      },
+      legend: { position: "bottom" },
     },
     scales: {
-      y: {
-        beginAtZero: true,
-      },
+      y: { beginAtZero: true },
     },
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow h-[300px]">
-      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+    <div className="bg-white p-4 rounded-2xl shadow h-[300px] flex flex-col">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">
+          Bytes enviados/recibidos por VLAN
+        </h2>
+        <select
+          className="border rounded px-2 py-1 text-sm"
+          value={vlanId}
+          onChange={(e) => setVlanId(e.target.value)}
+        >
+          {vlans.map((vlan) => (
+            <option key={vlan.id} value={vlan.id}>
+              {vlan.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="h-[240px] w-full">
-        <Bar data={data} options={options} />
+        {loading ? (
+          <p>Cargando datos...</p>
+        ) : (
+          <Bar data={data} options={options} />
+        )}
       </div>
     </div>
   );

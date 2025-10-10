@@ -49,6 +49,8 @@ class Registro(BaseModel):
     disco_total: float
     disco_usado: float
     disco_percent: float
+    bytes_enviados: float
+    bytes_recibidos: float
     timestamp: datetime
 
     class Config:

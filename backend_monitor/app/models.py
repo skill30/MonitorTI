@@ -21,7 +21,6 @@ class Equipo(Base):
     vlan = relationship("VLAN", back_populates="equipos")
     registros = relationship("Registro", back_populates="equipo")
 
-
 class Registro(Base):
     __tablename__ = "registros"
 
@@ -34,6 +33,8 @@ class Registro(Base):
     disco_total = Column(Float)
     disco_usado = Column(Float)
     disco_percent = Column(Float)
-    timestamp = Column(DateTime, default=datetime.now)  # <== ya no es isoformat
+    bytes_enviados = Column(Float)
+    bytes_recibidos = Column(Float)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
     equipo = relationship("Equipo", back_populates="registros")

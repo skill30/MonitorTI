@@ -20,6 +20,7 @@ def ciclo():
     data.update(obtener_red())
     enviar_datos(data)
 
+
 schedule.every(INTERVALO_SEGUNDOS).seconds.do(ciclo)
 
 print("🟢 Agente iniciado.")

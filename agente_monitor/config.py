@@ -84,6 +84,7 @@ def configurar_agente():
         DEFAULT_CONFIG["token"],
         vlans
     )
+
     if not exito:
         exit(1)
 

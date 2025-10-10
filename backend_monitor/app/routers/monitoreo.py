@@ -3,6 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi.responses import HTMLResponse
 from typing import List
+from datetime import datetime, timedelta
 
 from .. import models, schemas, database
 
@@ -64,7 +65,6 @@ def conteo_equipos_por_vlan(db: Session = Depends(get_db)):
         for r in resultados
     ]
 
-
 # ============================
 # Equipo Endpoints
 # ============================
@@ -108,15 +108,23 @@ def recibir_data(payload: schemas.RegistroCreate, db: Session = Depends(get_db),
         mem_uso_percent=payload.datos.get("mem_uso_percent", 0),
         disco_total=payload.datos.get("disco_total", 0),
         disco_usado=payload.datos.get("disco_usado", 0),
-        disco_percent=payload.datos.get("disco_percent", 0)
+        disco_percent=payload.datos.get("disco_percent", 0),
+        bytes_enviados=payload.datos.get("bytes_enviados", 0),      # <--- NUEVO
+        bytes_recibidos=payload.datos.get("bytes_recibidos", 0),    # <--- NUEVO    
     )
+
     db.add(nuevo)
     db.commit()
     return {"status": "ok", "registro_id": nuevo.id}
 
+
+# ============================
+# Consultas de registros
+# ============================
+
 @router.get("/registros/", response_model=List[schemas.Registro])
 def obtener_registros(db: Session = Depends(get_db)):
-    registros = db.query(models.Registro).order_by(models.Registro.timestamp.desc()).limit(100).all()
+    registros = db.query(models.Registro).order_by(models.Registro.timestamp.desc()).all()
     return [
         schemas.Registro(
             id=r.id,
@@ -128,6 +136,8 @@ def obtener_registros(db: Session = Depends(get_db)):
             disco_total=r.disco_total,
             disco_usado=r.disco_usado,
             disco_percent=r.disco_percent,
+            bytes_enviados=r.bytes_enviados,
+            bytes_recibidos=r.bytes_recibidos,
             timestamp=r.timestamp
         ) for r in registros
     ]
@@ -158,6 +168,8 @@ def registros_por_vlan(vlan_id: int, db: Session = Depends(get_db)):
             disco_total=r.disco_total,
             disco_usado=r.disco_usado,
             disco_percent=r.disco_percent,
+            bytes_enviados=r.bytes_enviados,      # <-- asegúrate que esté aquí
+            bytes_recibidos=r.bytes_recibidos,    # <-- asegúrate que esté aquí
             timestamp=r.timestamp
         ) for r in registros
     ]
@@ -182,6 +194,33 @@ def registros_por_equipo(equipo_id: int, db: Session = Depends(get_db)):
             disco_total=r.disco_total,
             disco_usado=r.disco_usado,
             disco_percent=r.disco_percent,
+            bytes_enviados=r.bytes_enviados,      # <-- asegúrate que esté aquí
+            bytes_recibidos=r.bytes_recibidos,    # <-- asegúrate que esté aquí
             timestamp=r.timestamp
         ) for r in registros
     ]
+
+# ============================
+# Equipos caídos (sin registros recientes)
+# ============================
+
+@router.get("/equipos/caidos")
+def equipos_caidos(db: Session = Depends(get_db)):
+    # Considera "caído" si no tiene registros en los últimos 8 minutos
+    hace_8_min = datetime.utcnow() - timedelta(minutes=8)
+    equipos = db.query(models.Equipo).all()
+    caidos = []
+    for equipo in equipos:
+        ultimo_registro = (
+            db.query(models.Registro)
+            .filter(models.Registro.equipo_id == equipo.id)
+            .order_by(models.Registro.timestamp.desc())
+            .first()
+        )
+        if not ultimo_registro or ultimo_registro.timestamp < hace_8_min:  # <-- corregido
+            caidos.append({
+                "id": equipo.id,
+                "nombre": equipo.nombre,
+                "vlan_id": equipo.vlan_id
+            })
+    return caidos

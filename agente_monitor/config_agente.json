@@ -1,6 +1,6 @@
 {
-    "id_equipo": "PC1",
-    "vlan": "vlan1",
+    "id_equipo": "PC-1",
+    "vlan": "Marketing",
     "servidor_url": "http://127.0.0.1:8000/api/registros/",
     "intervalo_segundos": 10,
     "token": "secreto123"
