@@ -21,9 +21,12 @@ class VLAN(VLANBase):
 class EquipoBase(BaseModel):
     nombre: str
     vlan_id: int
+    ip: str  # Agregar el campo IP
 
-class EquipoCreate(EquipoBase):
-    pass
+class EquipoCreate(BaseModel):
+    nombre: str
+    vlan_id: int
+    ip: str
 
 class Equipo(EquipoBase):
     id: int

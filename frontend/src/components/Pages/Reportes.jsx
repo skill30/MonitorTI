@@ -15,22 +15,22 @@ export default function Reporte() {
   });
 
   useEffect(() => {
-    fetch("http://10.0.0.138:8000/api/registros/")
+    fetch("http://192.168.1.53:8000/api/registros/")
       .then(res => res.json())
       .then(data => setTotalRegistros(data.length));
 
-    fetch("http://10.0.0.138:8000/api/equipos/")
+    fetch("http://192.168.1.53:8000/api/equipos/")
       .then(res => res.json())
       .then(data => {
         setEquipos(data);
         setRegistrosRecientes(data.slice(-5).reverse());
       });
 
-    fetch("http://10.0.0.138:8000/api/equipos/caidos")
+    fetch("http://192.168.1.53:8000/api/equipos/caidos")
       .then(res => res.json())
       .then(data => setPcsCaidas(data.length));
 
-    fetch("http://10.0.0.138:8000/api/vlans/")
+    fetch("http://192.168.1.53:8000/api/vlans/")
       .then(res => res.json())
       .then(data => setVlans(data));
   }, []);

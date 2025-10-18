@@ -1,7 +1,8 @@
 {
-    "id_equipo": "PC-1",
+    "id_equipo": "PC-Abel",
     "vlan": "Marketing",
-    "servidor_url": "http://127.0.0.1:8000/api/registros/",
+    "servidor_url": "http://192.168.1.53:8000/api/registros/",
     "intervalo_segundos": 10,
-    "token": "secreto123"
+    "token": "secreto123",
+    "ip": "192.168.1.53"
 }

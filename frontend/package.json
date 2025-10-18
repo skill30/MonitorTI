@@ -15,7 +15,7 @@
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "aos": "^2.3.4",
-    "astro": "5.14.1",
+    "astro": "5.14.6",
     "chart.js": "^4.5.0",
     "feather-icons": "^4.29.2",
     "jspdf": "^3.0.3",

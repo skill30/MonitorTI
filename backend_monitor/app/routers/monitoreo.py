@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi.responses import HTMLResponse
 from typing import List
 from datetime import datetime, timedelta
+import logging
 
 from .. import models, schemas, database
 
@@ -31,9 +32,7 @@ def get_db():
 def crear_vlan(vlan: schemas.VLANCreate, db: Session = Depends(get_db)):
     existente = db.query(models.VLAN).filter_by(nombre=vlan.nombre).first()
     if existente:
-
         raise HTTPException(status_code=400, detail="VLAN ya existe")
-    
     nueva = models.VLAN(nombre=vlan.nombre)
     db.add(nueva)
     db.commit()
@@ -69,16 +68,22 @@ def conteo_equipos_por_vlan(db: Session = Depends(get_db)):
 # Equipo Endpoints
 # ============================
 
-@router.post("/equipos/", response_model=schemas.Equipo)
-def registrar_equipo(equipo: schemas.EquipoCreate, db: Session = Depends(get_db)):
-    vlan = db.query(models.VLAN).filter_by(id=equipo.vlan_id).first()
-    if not vlan:
-        raise HTTPException(status_code=404, detail="VLAN no encontrada")
-    nuevo = models.Equipo(nombre=equipo.nombre, vlan_id=equipo.vlan_id)
-    db.add(nuevo)
+logging.basicConfig(level=logging.INFO)
+
+@router.post("/equipos/", response_model=schemas.EquipoCreate)
+async def registrar_equipo(equipo: schemas.EquipoCreate, db: Session = Depends(get_db)):
+    db_equipo = db.query(models.Equipo).filter(models.Equipo.nombre == equipo.nombre).first()
+    if db_equipo:
+        raise HTTPException(status_code=400, detail="El equipo ya está registrado")
+    nuevo_equipo = models.Equipo(
+        nombre=equipo.nombre,
+        vlan_id=equipo.vlan_id,
+        ip=equipo.ip
+    )
+    db.add(nuevo_equipo)
     db.commit()
-    db.refresh(nuevo)
-    return nuevo
+    db.refresh(nuevo_equipo)
+    return nuevo_equipo
 
 @router.get("/equipos/", response_model=List[schemas.Equipo])
 def obtener_equipos(db: Session = Depends(get_db)):
@@ -116,7 +121,6 @@ def recibir_data(payload: schemas.RegistroCreate, db: Session = Depends(get_db),
     db.add(nuevo)
     db.commit()
     return {"status": "ok", "registro_id": nuevo.id}
-
 
 # ============================
 # Consultas de registros

@@ -17,6 +17,7 @@ class Equipo(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, nullable=False)
     vlan_id = Column(Integer, ForeignKey("vlans.id"))
+    ip = Column(String, nullable=False)  # Agregar esta columna
 
     vlan = relationship("VLAN", back_populates="equipos")
     registros = relationship("Registro", back_populates="equipo")
