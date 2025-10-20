@@ -1,9 +1,9 @@
-import Header from "../components/Main/Header";
-import Sidebar from "../components/Main/Sidebar";
-import GraficoVLAN from "../components/Main/GraficoVLAN";
-import GraficoBar from "../components/Main/GraficoBar";
-import GraficoLinea from "../components/Main/GraficoLinea";
-import GraficoEquipos from "../components/Main/GraficoEquipos";
+import Header from "../Main/Header";
+import Sidebar from "../Main/Sidebar";
+import GraficoVLAN from "../Main/GraficoVLAN";
+import GraficoBar from "../Main/GraficoBar";
+import GraficoLinea from "../Main/GraficoLinea";
+import GraficoEquipos from "../Main/GraficoEquipos";
 
 export default function Dashboard() {
   return (

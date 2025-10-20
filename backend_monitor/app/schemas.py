@@ -59,3 +59,25 @@ class Registro(BaseModel):
     class Config:
         from_attributes = True
 
+# ===== Usuario =====
+
+class UsuarioBase(BaseModel):
+    nombre: str
+    rol: str
+
+class UsuarioCreate(BaseModel):
+    nombre: str
+    password: str  # Contraseña en texto plano para el registro
+    rol: str
+    
+class UsuarioLogin(BaseModel):
+    nombre: str
+    password: str
+
+class Usuario(UsuarioBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+

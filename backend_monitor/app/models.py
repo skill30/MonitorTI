@@ -39,3 +39,11 @@ class Registro(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     equipo = relationship("Equipo", back_populates="registros")
+
+class Usuario(Base):
+    __tablename__ = "usuarios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, unique=True, nullable=False)  # Nombre de usuario único
+    hashed_password = Column(String, nullable=False)  # Contraseña hasheada
+    rol = Column(String, nullable=False)  # Rol del usuario (e.g., admin, user)

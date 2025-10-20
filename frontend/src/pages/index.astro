@@ -1,19 +1,15 @@
 ---
-
-import Layout from '../layouts/Layout.astro';
-import Dashboard from '../pages/Dashboard.jsx';
-
+import Layout from "../layouts/Layout.astro";
+import Dashboard from "../components/Pages/Dashboard.jsx";
 ---
 
-<Layout>
-  <!-- Header de la página -->
-  <div class="p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard Monitoreo TI</h1>
+<!-- Redirigir a login automáticamente -->
+<script>
+  if (typeof window !== "undefined") {
+    window.location.href = "/login";
+  }
+</script>
 
-    <!-- Sección del Dashboard React -->
-    <section>
-      <!-- client:load asegura que React se cargue solo en el cliente -->
-      <Dashboard client:load />
-    </section>
-  </div>
+<Layout>
+  <Dashboard client:load/>
 </Layout>
