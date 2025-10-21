@@ -36,7 +36,7 @@ export default function Loginx() {
     setError("");
 
     try {
-      const response = await fetch("http://192.168.1.53:8000/api/usuarios/login", {
+      const response = await fetch("http://10.0.0.138:8000/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre: username, password })

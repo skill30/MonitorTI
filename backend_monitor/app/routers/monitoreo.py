@@ -78,7 +78,8 @@ async def registrar_equipo(equipo: schemas.EquipoCreate, db: Session = Depends(g
     nuevo_equipo = models.Equipo(
         nombre=equipo.nombre,
         vlan_id=equipo.vlan_id,
-        ip=equipo.ip
+        ip=equipo.ip,
+        mac=equipo.mac
     )
     db.add(nuevo_equipo)
     db.commit()

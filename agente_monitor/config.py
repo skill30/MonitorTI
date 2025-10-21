@@ -2,15 +2,17 @@ import json
 import os
 import requests
 import socket
+from recolectores.mac import obtener_mac_local  # nuevo
 
 CONFIG_FILE = "config_agente.json"
 DEFAULT_CONFIG = {
     "id_equipo": "",
     "vlan": "",
-    "servidor_url": "http://192.168.1.53:8000/api/registros/",
+    "servidor_url": "http://10.0.0.138:8000/api/registros/",
     "intervalo_segundos": 10,
     "token": "secreto123",
-    "ip": None  # Inicializamos el campo IP
+    "ip": None,   # Inicializamos el campo IP
+    "mac": None   # Nuevo: inicializamos el campo MAC
 }
 
 def obtener_vlans_disponibles(api_url, token):
@@ -50,7 +52,8 @@ def registrar_equipo(nombre_equipo, nombre_vlan, servidor_url, token, lista_vlan
         payload = {
             "nombre": nombre_equipo,
             "vlan_id": int(vlan_obj["id"]),
-            "ip": obtener_ip_local()  # Asegúrate de incluir este campo
+            "ip": obtener_ip_local(),   # ya existente
+            "mac": obtener_mac_local()  # agregado
         }
         
         headers = {"Authorization": f"Bearer {token}"}
@@ -89,8 +92,9 @@ def configurar_agente():
         else:
             print("❌ Opción no válida. Intenta de nuevo.")
 
-    # Agregar la IP al diccionario de configuración
+    # Agregar la IP y MAC al diccionario de configuración
     DEFAULT_CONFIG["ip"] = obtener_ip_local()
+    DEFAULT_CONFIG["mac"] = obtener_mac_local()
 
     # Intentar registrar equipo
     exito = registrar_equipo(
@@ -110,6 +114,13 @@ def configurar_agente():
         json.dump(DEFAULT_CONFIG, f, indent=4)
     print("✅ Configuración guardada en", CONFIG_FILE)
 
+
+
+
+
+
+
+
 # Ejecutar configuración solo si no existe el archivo
 if not os.path.exists(CONFIG_FILE):
     configurar_agente()
@@ -123,3 +134,4 @@ VLAN = cfg["vlan"]
 SERVIDOR_URL = cfg["servidor_url"]
 INTERVALO_SEGUNDOS = cfg["intervalo_segundos"]
 TOKEN = cfg["token"]
+

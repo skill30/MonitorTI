@@ -1,8 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Reporte from "../components/Pages/Reportes.jsx";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
 ---
 
-<Layout>
-  <Reporte client:load />
-</Layout>
+<ProtectedRoute client:load>
+  <Layout>
+    <Reporte client:load />
+  </Layout>
+</ProtectedRoute>

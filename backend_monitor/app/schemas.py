@@ -22,12 +22,14 @@ class EquipoBase(BaseModel):
     nombre: str
     vlan_id: int
     ip: str  # Agregar el campo IP
+    mac: str  # Agregar el campo MAC
 
 class EquipoCreate(BaseModel):
     nombre: str
     vlan_id: int
     ip: str
-
+    mac: str
+    
 class Equipo(EquipoBase):
     id: int
 

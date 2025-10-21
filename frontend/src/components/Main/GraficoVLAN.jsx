@@ -22,7 +22,7 @@ export default function GraficoVLAN() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("http://192.168.1.53:8000/api/vlans/equipos/conteo");
+        const res = await fetch("http://10.0.0.138:8000/api/vlans/equipos/conteo");
         if (!res.ok) throw new Error("Error cargando registros");
         const data = await res.json();
         setDatos(data);

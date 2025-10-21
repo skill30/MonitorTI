@@ -2,8 +2,10 @@
 
 import Layout from "../layouts/Layout.astro";
 import ConfiguracionPage from "../components/Pages/Configuracion";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
 ---
-
-<Layout>
-  <ConfiguracionPage client:load />
-</Layout>
+<ProtectedRoute client:load>
+  <Layout>
+    <ConfiguracionPage client:load />
+  </Layout>
+</ProtectedRoute>

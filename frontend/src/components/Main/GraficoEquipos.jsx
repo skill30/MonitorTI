@@ -30,7 +30,7 @@ export default function GraficoEquipos() {
   // Obtener lista de VLANs
   useEffect(() => {
     async function fetchVlans() {
-      const res = await fetch("http://192.168.1.53:8000/api/vlans/");
+      const res = await fetch("http://10.0.0.138:8000/api/vlans/");
       const data = await res.json();
       setVlans(data);
       if (data.length > 0) setVlanId(data[0].id);
@@ -44,7 +44,7 @@ export default function GraficoEquipos() {
     setLoading(true);
     async function fetchRegistros() {
       const res = await fetch(
-        `http://192.168.1.53:8000/api/vlans/${vlanId}/registros`
+        `http://10.0.0.138:8000/api/vlans/${vlanId}/registros`
       );
       const data = await res.json();
       setRegistros(data.reverse()); // Orden cronológico
