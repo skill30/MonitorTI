@@ -23,6 +23,7 @@ class AgenteMonitor:
             red_datos = obtener_red()
 
             # Formatear datos según el esquema RegistroCreate (usar claves reales)
+            
             datos = {
                 "equipo": ID_EQUIPO,
                 "datos": {

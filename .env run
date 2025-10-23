@@ -1,0 +1,9 @@
+crear usuario con curl 
+curl -s -X POST "http://10.0.0.138:8000/api/usuarios/register" \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Abel","password":"cisco123","rol":"admin"}'
+
+
+curl -s -X POST "http://10.0.0.138:8000/api/usuarios/register" \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Hamilton","password":"cisco123","rol":"admin"}'

@@ -12,6 +12,20 @@ export default defineConfig({
     ssr: {
       noExternal: ["react-router-dom"], // Asegura que react-router-dom se incluya en el bundle SSR
     },
+    server: {
+      // Permite subdominios de ngrok-free.dev (ej. adelina-sumption-calvin.ngrok-free.dev)
+      allowedHosts: ['.ngrok-free.dev'],
+      // opcional: acepta conexiones desde la red local
+      
+      host: true,
+      proxy: {
+        '/api': {
+          target: 'http://10.0.0.138:8000',
+          changeOrigin: true,
+          secure: false,
+        }
+      },
+    },
   },
 });
 
