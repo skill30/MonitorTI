@@ -21,8 +21,7 @@ class VLAN(VLANBase):
 class EquipoBase(BaseModel):
     nombre: str
     vlan_id: int
-    ip: str  # Agregar el campo IP
-    mac: str  # Agregar el campo MAC
+    mac: Optional[str] = None
 
 class EquipoCreate(BaseModel):
     nombre: str
@@ -71,6 +70,12 @@ class UsuarioCreate(BaseModel):
     nombre: str
     password: str  # Contraseña en texto plano para el registro
     rol: str
+
+class UsuarioUpdate(BaseModel):
+    nombre: Optional[str] = None
+    rol: Optional[str] = None
+    password: Optional[str] = None  # Nueva contraseña en texto plano
+
     
 class UsuarioLogin(BaseModel):
     nombre: str

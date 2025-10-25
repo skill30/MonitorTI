@@ -5,7 +5,6 @@ from .database import Base
 
 class VLAN(Base):
     __tablename__ = "vlans"
-
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True, nullable=False)
     equipos = relationship("Equipo", back_populates="vlan")
@@ -13,7 +12,6 @@ class VLAN(Base):
 
 class Equipo(Base):
     __tablename__ = "equipos"
-
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, nullable=False)
     vlan_id = Column(Integer, ForeignKey("vlans.id"))

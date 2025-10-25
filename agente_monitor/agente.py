@@ -88,13 +88,12 @@ class AgenteMonitor:
             except Exception as e:
                 print(f"❌ Error de conexión: {str(e)}")
                 print(traceback.format_exc())
-
+                
     async def ejecutar(self):
         print("🟢 Agente iniciado (modo asíncrono)")
         while True:
             try:
                 await self.recolectar_datos()
-                
                 # Si hay datos en buffer, esperar intervalo_envio y enviar
                 if len(self.buffer_datos) > 0:
                     await asyncio.sleep(self.intervalo_envio)

@@ -58,7 +58,7 @@ export default function Reporte() {
     doc.text("Últimos dispositivos registrados:", 10, 105);
     registrosRecientes.forEach((eq, i) => {
       doc.text(
-        `${eq.id} - ${eq.nombre} (VLAN ${eq.vlan_id})`,
+        `${eq.id} - ${eq.nombre} (VLAN ${eq.vlan_id}) MAC: ${eq.mac ?? "No disponible"}`,
         10,
         115 + i * 8
       );
@@ -166,6 +166,7 @@ export default function Reporte() {
                 <th className="px-4 py-2 border">ID</th>
                 <th className="px-4 py-2 border">Nombre</th>
                 <th className="px-4 py-2 border">VLAN</th>
+                <th className="px-4 py-2 border">MAC</th>
               </tr>
             </thead>
             <tbody>
@@ -174,6 +175,7 @@ export default function Reporte() {
                   <td className="px-4 py-2 border">{equipo.id}</td>
                   <td className="px-4 py-2 border">{equipo.nombre}</td>
                   <td className="px-4 py-2 border">{equipo.vlan_id}</td>
+                  <td className="px-4 py-2 border">{equipo.mac ?? "No disponible"}</td>
                 </tr>
               ))}
             </tbody>
