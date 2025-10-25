@@ -76,7 +76,6 @@ class UsuarioUpdate(BaseModel):
     rol: Optional[str] = None
     password: Optional[str] = None  # Nueva contraseña en texto plano
 
-    
 class UsuarioLogin(BaseModel):
     nombre: str
     password: str

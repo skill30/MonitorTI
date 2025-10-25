@@ -8,6 +8,8 @@ export default defineConfig({
   vite: {
     optimizeDeps: {
       include: ["react-router-dom"],
+
+
     },
     ssr: {
       noExternal: ["react-router-dom"], // Asegura que react-router-dom se incluya en el bundle SSR
@@ -20,7 +22,7 @@ export default defineConfig({
       host: true,
       proxy: {
         '/api': {
-          target: 'http://10.0.0.138:8000',
+          target: 'http://192.168.1.53:8000',
           changeOrigin: true,
           secure: false,
         }

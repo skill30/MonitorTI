@@ -122,7 +122,7 @@ export default function Loginx() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .animate-bg {
           animation: gradientBG 15s ease infinite;
           background-size: 400% 400%;
